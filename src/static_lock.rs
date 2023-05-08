@@ -29,7 +29,7 @@ pub struct FooooooooBar {
 }
 
 #[tokio::main]
-pub async fn run(client_thread_count: usize) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn run(client_thread_count: usize) {
     println!("Started test for locking static");
 
     let (tx, rx) = tokio::sync::mpsc::channel::<()>(1000000000);
@@ -40,7 +40,6 @@ pub async fn run(client_thread_count: usize) -> Result<(), Box<dyn std::error::E
     let handle = tokio::spawn(results_displayer::test_display(rx));
     handle.await.unwrap();
 
-    Ok(())
 }
 
 async fn sim_client(tx: Sender<()>) -> Result<(), io::Error> {
@@ -57,8 +56,8 @@ async fn sim_client(tx: Sender<()>) -> Result<(), io::Error> {
                 Err(_) => todo!(),
             }
             match tx.send(()).await {
-                Ok(_) => println!(""),
-                Err(err) => println!("Not sent"),
+                Ok(_) => (),
+                Err(_) => println!("Not sent"),
             }
         }
     });

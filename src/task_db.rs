@@ -79,7 +79,10 @@ pub async fn run(client_thread_count: usize) {
                     let _ = foo.devices.insert(key, val);
                     // Ignore errors
                     let _ = resp.send(Some(()));
-                    let _ = metrics_tx.send(()).await;
+                    match metrics_tx.send(()).await {
+                        Ok(_) => (),
+                        Err(_) => println!("metric count not sent"),
+                    }
                 }
             }
         }
