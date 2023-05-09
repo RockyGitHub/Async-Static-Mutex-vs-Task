@@ -107,7 +107,7 @@ pub async fn run(client_thread_count: usize) {
 }
 
 async fn sim_client(tx: Sender<Command>) {
-    sleep(Duration::from_millis(400)).await;
+    //sleep(Duration::from_millis(400)).await;
 
     loop {
         // Constantly set data
@@ -124,7 +124,9 @@ async fn sim_client(tx: Sender<Command>) {
         }
 
         //await the response
-        let _ = resp_rx.await;
+        if let Err(err) = resp_rx.await {
+            println!("err rxing response: [{}]", err)
+        }
     }
 }
 

@@ -43,24 +43,22 @@ pub async fn run(client_thread_count: usize) {
 }
 
 async fn sim_client(tx: Sender<()>) -> Result<(), io::Error> {
-    tokio::spawn(async move {
-        loop {
-            match FOO.lock() {
-                Ok(foo) => match foo.devices.lock() {
-                    Ok(mut devices) => {
-                        let device = FooooooooBar::default();
-                        devices.insert(42, device);
-                    }
-                    Err(_) => todo!(),
-                },
+    loop {
+        match FOO.lock() {
+            Ok(foo) => match foo.devices.lock() {
+                Ok(mut devices) => {
+                    let device = FooooooooBar::default();
+                    devices.insert(42, device);
+                }
                 Err(_) => todo!(),
-            }
-            match tx.send(()).await {
-                Ok(_) => (),
-                Err(_) => println!("Not sent"),
-            }
+            },
+            Err(_) => todo!(),
         }
-    });
+        match tx.send(()).await {
+            Ok(_) => (),
+            Err(_) => println!("Not sent"),
+        }
+    }
 
-    Ok(())
+    //Ok(())
 }
