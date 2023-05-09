@@ -113,7 +113,7 @@ async fn sim_client(tx: Sender<Command>) {
         // Constantly set data
         let (resp_tx, resp_rx) = oneshot::channel();
         let cmd = Command::Set {
-            key: 0x01,
+            key: 42,
             val: Device::default(),
             resp: resp_tx,
         };
