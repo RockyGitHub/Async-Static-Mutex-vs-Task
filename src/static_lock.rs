@@ -33,16 +33,19 @@ pub async fn run(client_thread_count: usize) {
     println!("Started test for locking static");
 
     let (tx, rx) = tokio::sync::mpsc::channel::<()>(1000000000);
-    for _ in 0..client_thread_count {
-        tokio::spawn(sim_client(tx.clone()));
-    }
 
     let handle = tokio::spawn(results_displayer::test_display(rx));
+
+    for _ in 0..client_thread_count {
+        let tx = tx.clone();
+        tokio::task::spawn_blocking(move || sim_client(tx));
+    }
+
     handle.await.unwrap();
 
 }
 
-async fn sim_client(tx: Sender<()>) -> Result<(), io::Error> {
+fn sim_client(tx: Sender<()>) -> Result<(), io::Error> {
     loop {
         match FOO.lock() {
             Ok(foo) => match foo.devices.lock() {
@@ -54,7 +57,7 @@ async fn sim_client(tx: Sender<()>) -> Result<(), io::Error> {
             },
             Err(_) => todo!(),
         }
-        match tx.send(()).await {
+        match tx.blocking_send(()) {
             Ok(_) => (),
             Err(_) => println!("Not sent"),
         }
